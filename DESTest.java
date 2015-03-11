@@ -30,10 +30,9 @@ public class DESTest{
     }
     System.out.println(plaintext);
 
-    byte[] b = s.getBytes();
+    byte[] b = plaintext.getBytes();
     //Integer i = new Integer(b);
     System.out.println(new Byte(b[0]));
-
 
   }
 
