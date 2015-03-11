@@ -34,6 +34,9 @@ public class DESTest{
     //Integer i = new Integer(b);
     System.out.println(new Byte(b[0]));
 
+    DES ds = new DES();
+
+
   }
 
 }
