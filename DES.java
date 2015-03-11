@@ -4,6 +4,8 @@ import java.util.*;
 public class DES{
 
   private int deskey;
+  private int[] bits64 = new int[64];
+
   private static final int[]
   IP = {
     58, 50, 42, 34, 26, 18, 10, 2,
@@ -108,15 +110,71 @@ public class DES{
   };
 
   public DES(){
-    System.out.println(S[0][0][0]);
+
   }
 
-  public DES(String bit64){
+  public DES(String char8){
+
+
+    //System.out.println(S[0][0][0]);
+
+    for(int i=0; i<8; i++){
+
+      String bin = "00000000";
+      bin = bin.concat(Integer.toBinaryString( (int)char8.charAt(i) ) );
+
+      while(bin.length() != 8){
+        bin = bin.replaceFirst("0", "");
+
+      }
+
+      System.out.println(bin);
+    //  System.out.println(bin.length());
+    //  System.out.println( char8.charAt(i) );
+    //  System.out.println( Integer.toBinaryString( (int)char8.charAt(i) ));
+
+    //  (new Scanner(System.in)).next();
+
+      for(int j = 0; j<8; j++){
+
+      //  System.out.println(Character.digit(bin.charAt(j), 10));
+        //(new Scanner(System.in)).next();
+
+        bits64[(i*8) + j] = Character.digit(bin.charAt(j), 10);
+
+      }
+
+    }
+
+    System.out.println(Arrays.toString(bits64));
+
+  }
+
+  public int[] initialPermutation(){
+
+    int[] ipbits64 = new int[64];
+
+    for(int i=0; i<64; i++){
+      ipbits64[IP[i]] = (new Integer(bits64[i])).intValue();
+    }
+
+    return ipbits64;
+
+  }
+
+  public int[] finalPermutation(int[] ebits){
+    int[] ipbits64 = new int[64];
+
+    for(int i=0; i<64; i++){
+      ipbits64[FP[i]] = (new Integer(ebits4[i])).intValue();
+    }
+
+    return ipbits64;
 
   }
 
   public static void main(String[] args){
-    DES d = new DES();
+    DES d = new DES("jacobvil");
   }
 
 }
