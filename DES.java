@@ -1,10 +1,10 @@
 import java.io.*;
 import java.util.*;
-import java.lang.Object;
+import java.math.BigInteger;
 
 public class DES{
 
-  private int deskey;
+  private int[] deskey;
   public int[] bits64 = new int[64];
 
   private static final int[]
@@ -114,22 +114,22 @@ public class DES{
 
   }
 
-  public DES(String char8){
+  public DES(String char8, String key16){
 
+    //Plaintext
 
     //System.out.println(S[0][0][0]);
 
     for(int i=0; i<8; i++){
 
-      String bin = "00000000";
+      String bin = "";
       bin = bin.concat(Integer.toBinaryString( (int)char8.charAt(i) ) );
 
       while(bin.length() != 8){
-        bin = bin.replaceFirst("0", "");
-
+        bin = "0" + bin;
       }
 
-    //  System.out.println(bin);
+      System.out.println(bin);
     //  System.out.println(bin.length());
     //  System.out.println( char8.charAt(i) );
     //  System.out.println( Integer.toBinaryString( (int)char8.charAt(i) ));
@@ -150,14 +150,31 @@ public class DES{
     System.out.println("Original Bits");
     System.out.println(Arrays.toString(bits64) + "\n");
 
+    //Key
+
+    BigInteger kbi = new BigInteger(key16, 16);
+
+    String kbis = kbi.toString(2);
+
+    while(kbis.length() != 64){
+      kbis = "0" + kbis;
+    }
+
+    for(int i=0; i<64; i++){
+      
+    }
+
+
+
   }
 
-  public int[] initialPermutation(int[] bits){
+  public int[] initialPermutation(){//int[] bits){
 
     int[] ipbits = new int[64];
 
     for(int i=0; i<64; i++){
-      ipbits[(IP[i]) - 1] = (new Integer(bits[i])).intValue();
+      //ipbits[(IP[i]) - 1] = (new Integer(bits[i])).intValue();
+      ipbits[(IP[i]) - 1] = (new Integer(this.bits64[i])).intValue();
     }
 
 
@@ -192,6 +209,21 @@ public class DES{
 
   }
 
+  public int[] functionF(int[] rbits, int[] rndkey){
+
+    int[] fbits = new int[32];
+
+    int[] exprbits = new int[48];
+    //Expansion
+
+    for(int i=0; i<48; i++){
+      exprbits[i] = this.E[i-1];
+    }
+
+    return fbits;
+
+  }
+
   public int[] xor(int[] bits1, int[] bits2, int size){
 
     if(bits1.length != bits2.length){
@@ -207,11 +239,12 @@ public class DES{
     return xorbits;
   }
 
-  public int[] finalPermutation(int[] bits){
+public int[] finalPermutation(){ //int[] bits){
     int[] fpbits = new int[64];
 
     for(int i=0; i<64; i++){
-      fpbits[(FP[i]) - 1] = (new Integer(bits[i])).intValue();
+      //fpbits[(FP[i]) - 1] = (new Integer(bits[i])).intValue();
+      fpbits[(FP[i]) - 1] = (new Integer(this.bits64[i])).intValue();
     }
     System.out.println("Final Permutation");
     System.out.println(Arrays.toString(fpbits) + "\n");
@@ -221,17 +254,34 @@ public class DES{
   }
 
   public static void main(String[] args){
-    DES d = new DES("jacobvil");
-    int[] ip = d.initialPermutation(d.bits64);
+    DES d = new DES("jacobvil", "101010101010101");
+    //int[] ip = d.initialPermutation(d.bits64);
+    int[] ip = d.initialPermutation();
 
     int[] r = d.round(ip);
 
-    ip = d.finalPermutation(d.bits64);
+    //ip = d.finalPermutation(d.bits64);
+    ip = d.finalPermutation();
 
     System.out.println("Test \n" +  Arrays.toString(r) + "\n");
 
     System.out.println("Test \n" +  Arrays.toString(ip) + "\n");
     //int[] fp = d.finalPermutation(d.bits64);
+
+    /*String hex = "101010101010101";
+    int i = Integer.parseInt(hex, 16);
+    String bin = BigInteger.toBinaryString(i);*/
+
+    /*BigInteger bi = new BigInteger("101010101010101", 16);
+
+    String bebe = bi.toString(2);
+    System.out.println(bebe + "\n");
+
+    while(bebe.length() != 64){
+      bebe = "0" + bebe;
+    }
+
+    System.out.println(bebe + "\n");*/
 
   }
 
