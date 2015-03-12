@@ -1,10 +1,11 @@
 import java.io.*;
 import java.util.*;
+import java.lang.Object;
 
 public class DES{
 
   private int deskey;
-  private int[] bits64 = new int[64];
+  public int[] bits64 = new int[64];
 
   private static final int[]
   IP = {
@@ -128,7 +129,7 @@ public class DES{
 
       }
 
-      System.out.println(bin);
+    //  System.out.println(bin);
     //  System.out.println(bin.length());
     //  System.out.println( char8.charAt(i) );
     //  System.out.println( Integer.toBinaryString( (int)char8.charAt(i) ));
@@ -146,35 +147,92 @@ public class DES{
 
     }
 
-    System.out.println(Arrays.toString(bits64));
+    System.out.println("Original Bits");
+    System.out.println(Arrays.toString(bits64) + "\n");
 
   }
 
-  public int[] initialPermutation(){
+  public int[] initialPermutation(int[] bits){
 
-    int[] ipbits64 = new int[64];
+    int[] ipbits = new int[64];
 
     for(int i=0; i<64; i++){
-      ipbits64[IP[i]] = (new Integer(bits64[i])).intValue();
+      ipbits[(IP[i]) - 1] = (new Integer(bits[i])).intValue();
     }
 
-    return ipbits64;
+
+    System.out.println("Initial Permutation");
+    System.out.println(Arrays.toString(ipbits) + "\n");
+    return ipbits;
 
   }
 
-  public int[] finalPermutation(int[] ebits){
-    int[] ipbits64 = new int[64];
+  public int[] round(int[] bits){
 
-    for(int i=0; i<64; i++){
-      ipbits64[FP[i]] = (new Integer(ebits4[i])).intValue();
+    int[] rndbits = new int[64];
+    int[] lbits = new int[32];
+    int[] rbits = new int[32];
+
+    lbits = Arrays.copyOfRange(bits, 0, 32);
+    rbits = Arrays.copyOfRange(bits, 32, 64);
+
+    System.arraycopy(rbits, 0, rndbits, 0, 32);
+
+
+    System.arraycopy(lbits, 0, rndbits, 32, 32);
+
+    //System.out.println("\n" + Arrays.toString(bits));
+    //System.out.println("\n" + Arrays.toString(lbits));
+    //System.out.println("\n" + Arrays.toString(rbits));
+
+    System.out.println("Round Bits");
+    System.out.println(Arrays.toString(rndbits) + "\n");
+
+    return rndbits;
+
+  }
+
+  public int[] xor(int[] bits1, int[] bits2, int size){
+
+    if(bits1.length != bits2.length){
+      return null;
     }
 
-    return ipbits64;
+    int[] xorbits = new int[size];
+
+    for(int i=0; i<size; i++){
+      xorbits[i] = bits1[i] ^ bits2[i];
+    }
+
+    return xorbits;
+  }
+
+  public int[] finalPermutation(int[] bits){
+    int[] fpbits = new int[64];
+
+    for(int i=0; i<64; i++){
+      fpbits[(FP[i]) - 1] = (new Integer(bits[i])).intValue();
+    }
+    System.out.println("Final Permutation");
+    System.out.println(Arrays.toString(fpbits) + "\n");
+
+    return fpbits;
 
   }
 
   public static void main(String[] args){
     DES d = new DES("jacobvil");
+    int[] ip = d.initialPermutation(d.bits64);
+
+    int[] r = d.round(ip);
+
+    ip = d.finalPermutation(d.bits64);
+
+    System.out.println("Test \n" +  Arrays.toString(r) + "\n");
+
+    System.out.println("Test \n" +  Arrays.toString(ip) + "\n");
+    //int[] fp = d.finalPermutation(d.bits64);
+
   }
 
 }
