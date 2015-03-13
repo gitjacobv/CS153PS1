@@ -4,7 +4,7 @@ import java.math.BigInteger;
 
 public class DES{
 
-  private int[] deskey;
+  private int[] deskey = new int[64];
   public int[] bits64 = new int[64];
 
   private static final int[]
@@ -129,7 +129,7 @@ public class DES{
         bin = "0" + bin;
       }
 
-      System.out.println(bin);
+    //  System.out.println(bin);
     //  System.out.println(bin.length());
     //  System.out.println( char8.charAt(i) );
     //  System.out.println( Integer.toBinaryString( (int)char8.charAt(i) ));
@@ -161,8 +161,13 @@ public class DES{
     }
 
     for(int i=0; i<64; i++){
-      
+
+      deskey[i] = Character.digit(kbis.charAt(i), 10);
+
     }
+
+    //System.out.println(kbis);
+    //System.out.println("Deskey: " + Arrays.toString(deskey));
 
 
 
@@ -205,23 +210,87 @@ public class DES{
     System.out.println("Round Bits");
     System.out.println(Arrays.toString(rndbits) + "\n");
 
+    int[] bits48 = new int[48];
+    Arrays.fill(bits48, 0);
+
+    functionF(rbits, bits48);
+
     return rndbits;
 
   }
 
-  public int[] functionF(int[] rbits, int[] rndkey){
+  public int[] functionF(int[] rbits, int[] rndkeybits){
 
     int[] fbits = new int[32];
-
     int[] exprbits = new int[48];
+    int[] fpbits = new int[32];
     //Expansion
 
     for(int i=0; i<48; i++){
-      exprbits[i] = this.E[i-1];
+      exprbits[i] = rbits[this.E[i] - 1];
     }
 
-    return fbits;
+    System.out.println("Expanded bits \n" + Arrays.toString(exprbits) + "\n");
 
+    //expanded bits xor with rndkeybits
+    int[] sbits = xor(exprbits, rndkeybits, 48);
+
+    System.out.println("sbits\n " + Arrays.toString(sbits) + "\n");
+
+
+    //sboxes
+    for(int i=0; i<8; i++){
+      int[] bits4 = new int[4];
+
+      System.out.println("bits6 of " + i + " " + Arrays.toString(Arrays.copyOfRange(sbits, i*6, (i*6)+6)));
+      Arrays.toString(Arrays.copyOfRange(sbits, i*6, (i*6)+6));
+      bits4 = sbox(Arrays.copyOfRange(sbits, i*6, (i*6)+6), i);
+
+      for(int j=0; j<4 ; j++){
+        fbits[(i*4)+j] = (new Integer(bits4[j])).intValue();
+      }
+    }
+
+    System.out.println("FBITS\n" + Arrays.toString(fbits) + "\n");
+
+    //Permutation P
+
+    for(int i=0; i<32; i++){
+      fpbits[i] = fbits[this.P[i] - 1];
+    }
+
+    return fpbits;
+
+  }
+
+  public int[] sbox(int[] bits, int snumber){
+
+    int[] bits4 = new int[4];
+    Arrays.fill(bits4, 0);
+
+    BigInteger row = new BigInteger(Integer.toString(bits[0]) + Integer.toString(bits[5]), 2);
+    BigInteger column = new BigInteger(bitsToString(Arrays.copyOfRange(bits, 1, 5)), 2);
+
+    System.out.println(row.intValue());
+    System.out.println(column.intValue() + "\n");
+
+    int sval = (new Integer(this.S[snumber][row.intValue()][column.intValue()])).intValue();
+    System.out.println("S " + sval);
+
+    BigInteger bibits = new BigInteger(Integer.toString(sval), 10);
+
+    String strbits4 = bibits.toString(2);
+
+    System.out.println("Bibits " + strbits4);
+
+    for(int i=0; i< strbits4.length() ;i++){
+      int strl = strbits4.length()-1;
+      bits4[3-i] = Character.digit(strbits4.charAt(strl-i), 10);
+    }
+
+    System.out.println("BITS 4 " + Arrays.toString(bits4) + "\n");
+
+    return bits4;
   }
 
   public int[] xor(int[] bits1, int[] bits2, int size){
@@ -239,7 +308,7 @@ public class DES{
     return xorbits;
   }
 
-public int[] finalPermutation(){ //int[] bits){
+  public int[] finalPermutation(){ //int[] bits){
     int[] fpbits = new int[64];
 
     for(int i=0; i<64; i++){
@@ -251,6 +320,14 @@ public int[] finalPermutation(){ //int[] bits){
 
     return fpbits;
 
+  }
+
+  public String bitsToString(int[] bits){
+    String s = "";
+    for(int i=0; i<bits.length; i++){
+      s = s + Integer.toString(bits[i]);
+    }
+    return s;
   }
 
   public static void main(String[] args){
