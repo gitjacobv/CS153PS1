@@ -169,8 +169,6 @@ public class DES{
     //System.out.println(kbis);
     //System.out.println("Deskey: " + Arrays.toString(deskey));
 
-
-
   }
 
   public int[] initialPermutation(){//int[] bits){
@@ -189,33 +187,41 @@ public class DES{
 
   }
 
-  public int[] round(int[] bits){
+  public int[][] round(int[] lbits, int[] rbits, int[] rndkey){
 
-    int[] rndbits = new int[64];
-    int[] lbits = new int[32];
-    int[] rbits = new int[32];
+    int[][] lrbits = new int[2][32];
 
-    lbits = Arrays.copyOfRange(bits, 0, 32);
-    rbits = Arrays.copyOfRange(bits, 32, 64);
+    //operate on R
 
-    System.arraycopy(rbits, 0, rndbits, 0, 32);
+    System.arraycopy(rbits, 0, lrbits[0], 0, 32);
 
+    int[] fbits = Arrays.copyOf(functionF(rbits, rndkey), 32);
 
-    System.arraycopy(lbits, 0, rndbits, 32, 32);
+    //Operate on L
+
+    int[] lfbits = Arrays.copyOf(xor(lbits, fbits, 32), 32);
+    System.arraycopy(lfbits, 0, lrbits[1], 0, 32);
+
+    //int[] lbits = new int[32];
+    //int[] rbits = new int[32];
+
+    //lbits = Arrays.copyOfRange(bits, 0, 32);
+    //rbits = Arrays.copyOfRange(bits, 32, 64);
+
+    //System.arraycopy(rbits, 0, rndbits, 0, 32);
+    //System.arraycopy(lbits, 0, rndbits, 32, 32);
 
     //System.out.println("\n" + Arrays.toString(bits));
     //System.out.println("\n" + Arrays.toString(lbits));
     //System.out.println("\n" + Arrays.toString(rbits));
 
-    System.out.println("Round Bits");
-    System.out.println(Arrays.toString(rndbits) + "\n");
+    System.out.println("Round Bits L");
+    System.out.println(Arrays.toString(lrbits[0]) + "\n");
 
-    int[] bits48 = new int[48];
-    Arrays.fill(bits48, 0);
+    System.out.println("Round Bits R");
+    System.out.println(Arrays.toString(lrbits[1]) + "\n");
 
-    functionF(rbits, bits48);
-
-    return rndbits;
+    return lrbits ;
 
   }
 
@@ -242,7 +248,7 @@ public class DES{
     for(int i=0; i<8; i++){
       int[] bits4 = new int[4];
 
-      System.out.println("bits6 of " + i + " " + Arrays.toString(Arrays.copyOfRange(sbits, i*6, (i*6)+6)));
+      //System.out.println("bits6 of " + i + " " + Arrays.toString(Arrays.copyOfRange(sbits, i*6, (i*6)+6)));
       Arrays.toString(Arrays.copyOfRange(sbits, i*6, (i*6)+6));
       bits4 = sbox(Arrays.copyOfRange(sbits, i*6, (i*6)+6), i);
 
@@ -251,7 +257,7 @@ public class DES{
       }
     }
 
-    System.out.println("FBITS\n" + Arrays.toString(fbits) + "\n");
+    //System.out.println("FBITS\n" + Arrays.toString(fbits) + "\n");
 
     //Permutation P
 
@@ -271,24 +277,24 @@ public class DES{
     BigInteger row = new BigInteger(Integer.toString(bits[0]) + Integer.toString(bits[5]), 2);
     BigInteger column = new BigInteger(bitsToString(Arrays.copyOfRange(bits, 1, 5)), 2);
 
-    System.out.println(row.intValue());
-    System.out.println(column.intValue() + "\n");
+    //System.out.println(row.intValue());
+    //System.out.println(column.intValue() + "\n");
 
     int sval = (new Integer(this.S[snumber][row.intValue()][column.intValue()])).intValue();
-    System.out.println("S " + sval);
+    //System.out.println("S " + sval);
 
     BigInteger bibits = new BigInteger(Integer.toString(sval), 10);
 
     String strbits4 = bibits.toString(2);
 
-    System.out.println("Bibits " + strbits4);
+    //System.out.println("Bibits " + strbits4);
 
     for(int i=0; i< strbits4.length() ;i++){
       int strl = strbits4.length()-1;
       bits4[3-i] = Character.digit(strbits4.charAt(strl-i), 10);
     }
 
-    System.out.println("BITS 4 " + Arrays.toString(bits4) + "\n");
+    //System.out.println("BITS 4 " + Arrays.toString(bits4) + "\n");
 
     return bits4;
   }
@@ -330,35 +336,64 @@ public class DES{
     return s;
   }
 
+  public int[] desCipher(){
+
+    //Initial Permutation
+    int[] ipbits = this.initialPermutation();
+
+    //Round
+    int[][] lrbits = new int[][]{ Arrays.copyOfRange(ipbits, 0, 32), Arrays.copyOfRange(ipbits, 32, 64) };
+
+    for(int i=0; i<16; i++){
+
+      int[] bits48 = new int[48];
+      Arrays.fill(bits48, 0);
+
+      //call key sched here
+
+      System.out.println("---------------------- Round " + (i+1) + " ----------------------\n");
+
+      lrbits = round(lrbits[0], lrbits[1], bits48);
+
+    }
+
+    /*int[] rndbits = new int[64];
+    System.arraycopy(lrbits[0], 0, rndbits, 32);
+    System.arraycopy(lrbits[1], 32, rndbits, 32);*/
+
+    System.arraycopy(lrbits[0], 0, this.bits64, 0, 32);
+    System.arraycopy(lrbits[1], 0, this.bits64, 32, 32);
+
+    int[] fpbits = this.finalPermutation();
+
+    return fpbits;
+
+  }
+
   public static void main(String[] args){
     DES d = new DES("jacobvil", "101010101010101");
     //int[] ip = d.initialPermutation(d.bits64);
     int[] ip = d.initialPermutation();
 
-    int[] r = d.round(ip);
-
     //ip = d.finalPermutation(d.bits64);
     ip = d.finalPermutation();
 
-    System.out.println("Test \n" +  Arrays.toString(r) + "\n");
+    System.out.println("Test IP B \n" +  Arrays.toString(ip) + "\n");
 
-    System.out.println("Test \n" +  Arrays.toString(ip) + "\n");
+    int[] bit0 = new int[64];
+    Arrays.fill(bit0, 0);
+
+    ip = d.xor(ip, bit0, 64);
+
+    System.out.println("Test IP A \n" +  Arrays.toString(ip) + "\n");
+
+    int[] r = d.desCipher();
+
+    System.out.println("Test R \n" +  Arrays.toString(r) + "\n");
+    //System.out.println("Test R \n" +  Arrays.toString(r[1]) + "\n");
+
     //int[] fp = d.finalPermutation(d.bits64);
 
-    /*String hex = "101010101010101";
-    int i = Integer.parseInt(hex, 16);
-    String bin = BigInteger.toBinaryString(i);*/
-
-    /*BigInteger bi = new BigInteger("101010101010101", 16);
-
-    String bebe = bi.toString(2);
-    System.out.println(bebe + "\n");
-
-    while(bebe.length() != 64){
-      bebe = "0" + bebe;
-    }
-
-    System.out.println(bebe + "\n");*/
 
   }
 
