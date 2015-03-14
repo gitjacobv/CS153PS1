@@ -166,8 +166,8 @@ public class DES{
 
     }
 
-    //System.out.println(kbis);
-    //System.out.println("Deskey: " + Arrays.toString(deskey));
+    System.out.println(kbis);
+    System.out.println("Deskey: " + Arrays.toString(deskey) + "\n");
 
   }
 
@@ -370,8 +370,8 @@ public class DES{
 
   }
 
-  public static void main(String[] args){
-    DES d = new DES("jacobvil", "101010101010101");
+  /*public static void main(String[] args){
+    DES d = new DES("jacobvil", "fefefefefefefefe");
     //int[] ip = d.initialPermutation(d.bits64);
     int[] ip = d.initialPermutation();
 
@@ -395,6 +395,6 @@ public class DES{
     //int[] fp = d.finalPermutation(d.bits64);
 
 
-  }
+  }*/
 
 }
