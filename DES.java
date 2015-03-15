@@ -404,7 +404,11 @@ public class DES{
         pc2bits[j] = (new Integer(cdkey[ PC2[j] - 1])).intValue();
       }
 
-      System.out.println("\nROUNDKEY: \t" + partString(bitsToString(pc2bits), 6) + "\n");
+      System.out.println("\nROUNDKEY(2): \t" + partString(bitsToString(pc2bits), 6) + "\n");
+
+      BigInteger rkbi = new BigInteger(bitsToString(pc2bits), 2);
+
+      System.out.println("ROUNDKEY(16): \t" + rkbi.toString(16) + "\n");
 
       //Round i
       lrbits = round(lrbits[0], lrbits[1], pc2bits);
