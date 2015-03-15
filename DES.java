@@ -321,7 +321,6 @@ public class DES{
     int[] fpbits = new int[64];
 
     for(int i=0; i<64; i++){
-      //fpbits[(FP[i]) - 1] = (new Integer(bits[i])).intValue();
       fpbits[(FP[i]) - 1] = (new Integer(this.bits64[i])).intValue();
     }
 
