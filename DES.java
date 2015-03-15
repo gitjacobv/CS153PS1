@@ -102,15 +102,15 @@ public class DES{
     }
   };
 
- private static final int[]
-  P = {
+ private static final int[] P = {
     16, 7,  20, 21, 29, 12, 28, 17,
     1,  15, 23, 26, 5,  18, 31, 10,
     2,  8,  24, 14, 32, 27,  3,  9,
     19, 13, 30,  6, 22, 11,  4, 25
   };
 
-  private static final int[] PC1 = {
+  private static final int[]
+  PC1 = {
     57, 49, 41, 33, 25, 17,  9,
     1, 58, 50, 42, 34, 26, 18,
     10,  2, 59, 51, 43, 35, 27,
@@ -121,7 +121,8 @@ public class DES{
     21, 13,  5, 28, 20, 12,  4
   };
 
-  private static final int[] PC2 = {
+  private static final int[]
+  PC2 = {
     14, 17, 11, 24,  1,  5, 3, 28,
     15,  6, 21, 10, 23, 19, 12, 4,
     26,  8, 16, 7, 27, 20, 13,  2,
@@ -130,31 +131,27 @@ public class DES{
     34, 53, 46, 42, 50, 36, 29, 32
   };
 
-  public DES(String char8, String key16){
+  public DES(String plaintext, String key){
 
+    BigInteger pbi = new BigInteger(plaintext, 16);
 
-    for(int i=0; i<8; i++){
+    String pbis = pbi.toString(2);
 
-      String bin = "";
-      bin = bin.concat(Integer.toBinaryString( (int)char8.charAt(i) ) );
+    while(pbis.length() != 64){
+      pbis = "0" + pbis;
+    }
 
-      while(bin.length() != 8){
-        bin = "0" + bin;
-      }
+    for(int i=0; i<64; i++){
 
-      for(int j = 0; j<8; j++){
-
-        bits64[(i*8) + j] = Character.digit(bin.charAt(j), 10);
-
-      }
+      bits64[i] = Character.digit(pbis.charAt(i), 10);
 
     }
 
-    System.out.println("Original Bits: " + bitsToString(this.bits64) + "\n");
+    System.out.println("Original Bits: " + partString(bitsToString(this.bits64), 4));
 
     //Key
 
-    BigInteger kbi = new BigInteger(key16, 16);
+    BigInteger kbi = new BigInteger(key, 16);
 
     String kbis = kbi.toString(2);
 
@@ -168,17 +165,17 @@ public class DES{
 
     }
 
-    System.out.println("Key(in Binary): " + bitsToString(this.deskey));
+    System.out.println("Key(in Binary): " + partString(bitsToString(this.deskey), 8) + "\n");
 
   }
 
-  public int[] initialPermutation(){//int[] bits){
+  public int[] initialPermutation(){
 
     int[] ipbits = new int[64];
 
     for(int i=0; i<64; i++){
-      //ipbits[(IP[i]) - 1] = (new Integer(bits[i])).intValue();
-      ipbits[(IP[i]) - 1] = (new Integer(this.bits64[i])).intValue();
+
+      ipbits[i] = (new Integer(this.bits64[(IP[i]) - 1])).intValue();
     }
 
     return ipbits;
@@ -198,6 +195,7 @@ public class DES{
     //Operate on L
 
     int[] lfbits = Arrays.copyOf(xor(lbits, fbits, 32), 32);
+
     System.arraycopy(lfbits, 0, lrbits[1], 0, 32);
 
     return lrbits ;
@@ -222,7 +220,6 @@ public class DES{
     for(int i=0; i<8; i++){
       int[] bits4 = new int[4];
 
-      //System.out.println("bits6 of " + i + " " + Arrays.toString(Arrays.copyOfRange(sbits, i*6, (i*6)+6)));
       Arrays.toString(Arrays.copyOfRange(sbits, i*6, (i*6)+6));
       bits4 = sbox(Arrays.copyOfRange(sbits, i*6, (i*6)+6), i);
 
@@ -270,7 +267,7 @@ public class DES{
     int[] xorbits = new int[size];
 
     for(int i=0; i<size; i++){
-      xorbits[i] = bits1[i] ^ bits2[i];
+      xorbits[i] = ( bits1[i] + bits2[i] ) % 2;
     }
 
     return xorbits;
@@ -317,11 +314,11 @@ public class DES{
 
   }
 
-  public int[] finalPermutation(){ //int[] bits){
+  public int[] finalPermutation(){
     int[] fpbits = new int[64];
 
     for(int i=0; i<64; i++){
-      fpbits[(FP[i]) - 1] = (new Integer(this.bits64[i])).intValue();
+      fpbits[i] = (new Integer(this.bits64[(FP[i]) - 1])).intValue();
     }
 
     return fpbits;
@@ -336,15 +333,32 @@ public class DES{
     return s;
   }
 
+  public String partString(String s, int n){
+
+    String sss = "";
+
+    for(int i=0; i< s.length(); i++){
+
+      sss = sss + s.charAt(i);
+
+
+      if( ((i+1) % n ) == 0){
+        sss = sss + " ";
+      }
+    }
+
+    return sss;
+  }
+
   public int[] desCipher(){
 
     //Initial Permutation
-    int[] ipbits = this.initialPermutation();
+    int[] ipbits = initialPermutation();
 
-    System.out.println("Initial Permutation: " + bitsToString(ipbits) + "\n");
+    System.out.println("Initial Permutation: " + partString(bitsToString(ipbits), 4) + "\n");
 
     //Round 0
-    System.out.println("---------------------- Round 0 ----------------------\n");
+    System.out.println("------------------------------- Round 0 ------------------------------\n");
 
     //PC1
     int[] pc1bits = new int[56];
@@ -353,33 +367,36 @@ public class DES{
       pc1bits[i] = (new Integer( deskey[PC1[i] - 1] )).intValue();
     }
 
-    System.out.println("PC1: \t\t" + bitsToString(pc1bits));
+    System.out.println("PC: \t\t" + partString(bitsToString(pc1bits), 7));
 
     //Transform 0
-    int[][] cdbits = new int[][]{ Arrays.copyOfRange(pc1bits, 0, 28), Arrays.copyOfRange(ipbits, 28, 56) };
+    int[][] cdbits = new int[][]{ Arrays.copyOfRange(pc1bits, 0, 28), Arrays.copyOfRange(pc1bits, 28, 56) };
 
-    System.out.println("CD: \t\t" + bitsToString(cdbits[0]) +  bitsToString(cdbits[1]));
+    System.out.println("C: \t\t" + partString(bitsToString(cdbits[0]), 7));
+    System.out.println("D: \t\t" + partString(bitsToString(cdbits[1]), 7));
 
     //Round 0
     int[][] lrbits = new int[][]{ Arrays.copyOfRange(ipbits, 0, 32), Arrays.copyOfRange(ipbits, 32, 64) };
 
-    System.out.println("LR: \t\t" + bitsToString(lrbits[0]) +  bitsToString(lrbits[1]) + "\n");
+    System.out.println("L: \t\t" + partString(bitsToString(lrbits[0]), 4));
+    System.out.println("R: \t\t" + partString(bitsToString(lrbits[1]), 4) +"\n");
 
     for(int i=0; i<16; i++){
 
-      System.out.println("---------------------- Round " + (i+1) + " ----------------------\n");
+      System.out.println("------------------------------- Round " + (i+1) + " ------------------------------\n");
 
       //Transform i
       cdbits = transform(i, cdbits[0], cdbits[1]);
 
-      System.out.println("CD: \t\t" + bitsToString(cdbits[0]) +  bitsToString(cdbits[1]));
+      System.out.println("C: \t\t" + partString(bitsToString(cdbits[0]), 28));
+      System.out.println("D: \t\t" + partString(bitsToString(cdbits[1]), 28));
 
       //CD for PC2
       int[] cdkey = new int[56];
       System.arraycopy(cdbits[0], 0, cdkey, 0, 28);
       System.arraycopy(cdbits[1], 0, cdkey, 28, 28);
 
-      System.out.println("CD': \t\t" + bitsToString(cdkey));
+      //System.out.println("CD': \t\t" + partString(bitsToString(cdkey), 7));
 
       int[] pc2bits = new int[48];
 
@@ -387,22 +404,27 @@ public class DES{
         pc2bits[j] = (new Integer(cdkey[ PC2[j] - 1])).intValue();
       }
 
-      System.out.println("PC2: \t\t" + bitsToString(pc2bits));
+      System.out.println("\nROUNDKEY: \t" + partString(bitsToString(pc2bits), 6) + "\n");
 
       //Round i
       lrbits = round(lrbits[0], lrbits[1], pc2bits);
-      System.out.println("LR: \t\t" + bitsToString(lrbits[0]) + bitsToString(lrbits[0]));
+      System.out.println("L: \t\t" + partString(bitsToString(lrbits[0]), 4));
+      System.out.println("R: \t\t" + partString(bitsToString(lrbits[1]), 4) +"\n");
 
     }
 
-    System.arraycopy(lrbits[0], 0, this.bits64, 0, 32);
-    System.arraycopy(lrbits[1], 0, this.bits64, 32, 32);
+    System.arraycopy(lrbits[1], 0, this.bits64, 0, 32);
+    System.arraycopy(lrbits[0], 0, this.bits64, 32, 32);
 
     int[] fpbits = this.finalPermutation();
 
-    System.out.println("------------------------------------------------------\n");
+    System.out.println("-----------------------------------------------------------------------\n");
 
-    System.out.println("Final Permutation: " + bitsToString(fpbits) + "\n");
+    System.out.println("Final Permutation(2):  " + bitsToString(fpbits) + "\n");
+
+    BigInteger fpbi = new BigInteger(bitsToString(fpbits), 2);
+
+    System.out.println("Final Permutation(16): " + fpbi.toString(16) + "\n");
 
     return fpbits;
 
