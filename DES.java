@@ -407,8 +407,13 @@ public class DES{
       System.out.println("\nROUNDKEY(2): \t" + partString(bitsToString(pc2bits), 6) + "\n");
 
       BigInteger rkbi = new BigInteger(bitsToString(pc2bits), 2);
+      String rkbis16 = rkbi.toString(16);
 
-      System.out.println("ROUNDKEY(16): \t" + rkbi.toString(16) + "\n");
+      while(rkbis16.length() != 16){
+        rkbis16 = "0" + rkbis16;
+      }
+
+      System.out.println("ROUNDKEY(16): \t" + rkbis16 + "\n");
 
       //Round i
       lrbits = round(lrbits[0], lrbits[1], pc2bits);
@@ -427,8 +432,13 @@ public class DES{
     System.out.println("Final Permutation(2):  " + bitsToString(fpbits) + "\n");
 
     BigInteger fpbi = new BigInteger(bitsToString(fpbits), 2);
+    String fpbis16 = fpbi.toString(16);
 
-    System.out.println("Final Permutation(16): " + fpbi.toString(16) + "\n");
+    while(fpbis16.length() != 16){
+      fpbis16 = "0" + fpbis16;
+    }
+
+    System.out.println("Final Permutation(16): " + fpbis16 + "\n");
 
     ArrayList<String> als = new ArrayList<String>();
     als.add(bitsToString(fpbits));
