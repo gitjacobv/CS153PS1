@@ -166,15 +166,33 @@ public class DESTest{
 
     ArrayList<String> segmented = new ArrayList<String>();
 
+    ArrayList<String> printbin = new ArrayList<String>();
+    ArrayList<String> printhex = new ArrayList<String>();
+
     for(int a=0; a<plaintext.length(); a+=16){
 
       segmented.add(partitionedString(plaintext.substring(a)));
 
-
       System.out.println("***********Encrypting string: " + segmented.get(a/16) + "***********\n");
 
       DES d = new DES(segmented.get(a/16), key);
-      d.desCipher();
+      ArrayList<String> ir = d.desCipher();
+
+      printbin.add(ir.get(0));
+      printhex.add(ir.get(1));
+
+    }
+
+    System.out.println("\nCiphertext(2):");
+
+    for(int a=0; a<printbin.size(); a++){
+      System.out.print(printbin.get(a));
+    }
+
+    System.out.println("\n\nCiphertext(16):");
+
+    for(int a=0; a<printhex.size(); a++){
+      System.out.print(printhex.get(a));
     }
 
 

@@ -350,7 +350,7 @@ public class DES{
     return sss;
   }
 
-  public int[] desCipher(){
+  public ArrayList<String> desCipher(){
 
     //Initial Permutation
     int[] ipbits = initialPermutation();
@@ -430,7 +430,11 @@ public class DES{
 
     System.out.println("Final Permutation(16): " + fpbi.toString(16) + "\n");
 
-    return fpbits;
+    ArrayList<String> als = new ArrayList<String>();
+    als.add(bitsToString(fpbits));
+    als.add(fpbi.toString(16));
+
+    return als;
 
   }
 
