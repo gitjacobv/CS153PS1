@@ -372,14 +372,14 @@ public class DES{
     //Transform 0
     int[][] cdbits = new int[][]{ Arrays.copyOfRange(pc1bits, 0, 28), Arrays.copyOfRange(pc1bits, 28, 56) };
 
-    System.out.println("C: \t\t" + partString(bitsToString(cdbits[0]), 7));
-    System.out.println("D: \t\t" + partString(bitsToString(cdbits[1]), 7));
+    //System.out.println("C: \t\t" + partString(bitsToString(cdbits[0]), 7));
 
+    //System.out.println("D: \t\t" + partString(bitsToString(cdbits[1]), 7));
     //Round 0
     int[][] lrbits = new int[][]{ Arrays.copyOfRange(ipbits, 0, 32), Arrays.copyOfRange(ipbits, 32, 64) };
 
-    System.out.println("L: \t\t" + partString(bitsToString(lrbits[0]), 4));
-    System.out.println("R: \t\t" + partString(bitsToString(lrbits[1]), 4) +"\n");
+    //System.out.println("L: \t\t" + partString(bitsToString(lrbits[0]), 4));
+    //System.out.println("R: \t\t" + partString(bitsToString(lrbits[1]), 4) +"\n");
 
     for(int i=0; i<16; i++){
 
@@ -388,8 +388,8 @@ public class DES{
       //Transform i
       cdbits = transform(i, cdbits[0], cdbits[1]);
 
-      System.out.println("C: \t\t" + partString(bitsToString(cdbits[0]), 28));
-      System.out.println("D: \t\t" + partString(bitsToString(cdbits[1]), 28));
+      //System.out.println("C: \t\t" + partString(bitsToString(cdbits[0]), 28));
+      //System.out.println("D: \t\t" + partString(bitsToString(cdbits[1]), 28));
 
       //CD for PC2
       int[] cdkey = new int[56];
@@ -409,7 +409,7 @@ public class DES{
       BigInteger rkbi = new BigInteger(bitsToString(pc2bits), 2);
       String rkbis16 = rkbi.toString(16);
 
-      while(rkbis16.length() != 16){
+      while(rkbis16.length() != 12){
         rkbis16 = "0" + rkbis16;
       }
 
@@ -417,8 +417,8 @@ public class DES{
 
       //Round i
       lrbits = round(lrbits[0], lrbits[1], pc2bits);
-      System.out.println("L: \t\t" + partString(bitsToString(lrbits[0]), 4));
-      System.out.println("R: \t\t" + partString(bitsToString(lrbits[1]), 4) +"\n");
+      //System.out.println("L: \t\t" + partString(bitsToString(lrbits[0]), 4));
+      //System.out.println("R: \t\t" + partString(bitsToString(lrbits[1]), 4) +"\n");
 
     }
 
